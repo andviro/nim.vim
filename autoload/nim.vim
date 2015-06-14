@@ -226,3 +226,45 @@ if !exists("g:quickrun_config.nim")
   let g:quickrun_config.nim = { "exec": "nim c --run --verbosity:0 %S" }
 endif
 
+function! s:find_nimble_file(path) abort
+  let parent = a:path
+
+  while 1
+    let path = parent . '/*.nimble'
+    if glob(path) != ''
+      return parent
+    endif
+    let next = fnamemodify(parent, ':h')
+    if next == parent
+      return ''
+    endif
+    let parent = next
+  endwhile
+endfunction
+
+function! nim#Build(bang, ...)
+    let default_makeprg = &makeprg
+    let current_dir = getcwd()
+    let nimble_path = s:find_nimble_file(current_dir)
+
+    if !empty(nimble_path) != ''
+        exec "cd " . nimble_path
+        let &makeprg = "nimble build --listFullPaths"
+    endif
+
+    echon "nim.vim: " | echohl Identifier | echon "building ..."| echohl None
+    silent! exe 'make!'
+    redraw!
+
+    cwindow
+    let errors = getqflist()
+    if !empty(errors) 
+        if !a:bang
+            cc 1 "jump to first error if there is any
+        endif
+    else
+        redraws! | echon "nim.vim: " | echohl Function | echon "[build] SUCCESS"| echohl None
+    endif
+    exec "cd " . current_dir
+    let &makeprg = default_makeprg
+endfunction
