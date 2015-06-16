@@ -16,7 +16,8 @@ CompilerSet makeprg=nim\ c\ --listFullPaths\ --hint\\[Path\\]:off\ $*
 CompilerSet errorformat=
   \%-GHint:\ %m,
   \%E%f(%l\\,\ %c)\ Error:\ %m,
-  \%W%f(%l\\,\ %c)\ Hint:\ %m
+  \%I%f(%l\\,\ %c)\ Hint:\ %m,
+  \%W%f(%l\\,\ %c)\ Warning:\ %m
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

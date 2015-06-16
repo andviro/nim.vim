@@ -255,10 +255,17 @@ function! nim#Build(bang, ...)
     echon "nim.vim: " | echohl Identifier | echon "building ..."| echohl None
     silent! exe 'make!'
     redraw!
-    if v:shell_error
+
+    let has_errors = 0
+    for err in getqflist()
+        if err['type'] == 'E'
+            let has_errors = 1
+            break
+        endif
+    endfor
+    if has_errors
         cwindow
-        let errors = getqflist()
-        if !empty(errors) && !a:bang
+        if !a:bang
             cc 1 "jump to first error if there is any
         endif
     else
