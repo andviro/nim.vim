@@ -249,17 +249,16 @@ function! nim#Build(bang, ...)
 
     if !empty(nimble_path) != ''
         exec "cd " . nimble_path
-        let &makeprg = "nimble build --listFullPaths"
+        let &makeprg = "nimble build"
     endif
 
     echon "nim.vim: " | echohl Identifier | echon "building ..."| echohl None
     silent! exe 'make!'
     redraw!
-
-    cwindow
-    let errors = getqflist()
-    if !empty(errors) 
-        if !a:bang
+    if v:shell_error
+        cwindow
+        let errors = getqflist()
+        if !empty(errors) && !a:bang
             cc 1 "jump to first error if there is any
         endif
     else
